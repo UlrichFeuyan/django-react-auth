@@ -18,15 +18,20 @@ class NoteListCreate(ListCreateAPIView):
 
     def get_queryset(self):
         """surcharge la méthode get_queryset de ListCreateAPIView
-        Elles permet de limiter l'accès de cette fonction aux notes apartenant au User authentifier
+        Elles permet de limiter l'accès de cette fonction aux notes appartenant au User authentifier
 
         Returns:
-            _type_: Note
+            _type_: [Note] // list of notes
         """
         user = self.request.user
         return Note.objects.filter(author=user)
     
     def perform_create(self, serializer):
+        """Check validity of inputs before create new instance of Note (doing that by override perform_create method from ListCreateAPIView)
+
+        Args:
+            serializer (_type_): _description_
+        """
         if serializer.is_valid():
             serializer.save(author=self.request.user)
         else:
@@ -46,9 +51,3 @@ class NoteDelete(DestroyAPIView):
         """
         user = self.request.user
         return Note.objects.filter(author=user)
-    
-    def perform_create(self, serializer):
-        if serializer.is_valid():
-            serializer.save(author=self.request.user)
-        else:
-            print(serializer.errors)
